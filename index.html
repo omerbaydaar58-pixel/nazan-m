@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sevgilim İçin ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .container {
+            text-align: center;
+            color: white;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        .message {
+            font-size: 2.5rem;
+            margin: 20px 0;
+            opacity: 0;
+            transform: translateY(50px) scale(0.8);
+            transition: all 0.8s ease;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: bold;
+        }
+
+        .message.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .message.fade-out {
+            opacity: 0;
+            transform: translateY(-50px) scale(0.8);
+        }
+
+        .heart {
+            font-size: 3rem;
+            color: #ff6b6b;
+            animation: heartbeat 1.5s ease-in-out infinite;
+            margin: 20px 0;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .sparkle {
+            position: absolute;
+            color: #ffd700;
+            font-size: 2rem;
+            animation: sparkle 2s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes sparkle {
+            0% {
+                opacity: 1;
+                transform: scale(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1) rotate(180deg);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) rotate(360deg);
+            }
+        }
+
+        .final-message {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .apology {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .love {
+            font-size: 1.8rem;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .click-hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            opacity: 0.7;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .background-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .background-heart {
+            position: absolute;
+            color: rgba(255, 107, 107, 0.1);
+            font-size: 2rem;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.1;
+            }
+            50% { 
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-hearts" id="backgroundHearts"></div>
+    
+    <div class="container" id="container">
+        <div class="click-hint">Sayfaya tıklayın... ❤️</div>
+    </div>
+
+    <script>
+        const messages = [
+            "Merhaba sevgilim... 💕",
+            "Seni çok özledim... 😢",
+            "Hatalarım oldu... 😔",
+            "Ama seni seviyorum... ❤️",
+            "Sen benim her şeyimsin... 💖",
+            "Sen olmadan yaşayamam... 💕",
+            "Lütfen beni affet... 😭",
+            "Birlikte olmak istiyorum... 💝",
+            "Sen benim kalbimin sahibisin... 💗",
+            "Bir daha böyle olmayacak... 🤗"
+        ];
+
+        let currentMessage = 0;
+        let isAnimating = false;
+
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.innerHTML = '✨';
+            sparkle.style.left = x + 'px';
+            sparkle.style.top = y + 'px';
+            document.body.appendChild(sparkle);
+
+            setTimeout(() => {
+                sparkle.remove();
+            }, 2000);
+        }
+
+        function createBackgroundHearts() {
+            const container = document.getElementById('backgroundHearts');
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'background-heart';
+                heart.innerHTML = '💖';
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 6 + 's';
+                heart.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                container.appendChild(heart);
+            }
+        }
+
+        function showMessage() {
+            if (isAnimating || currentMessage >= messages.length) return;
+            
+            isAnimating = true;
+            const container = document.getElementById('container');
+            
+            // Hide click hint after first click
+            if (currentMessage === 0) {
+                document.querySelector('.click-hint').style.display = 'none';
+            }
+
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = messages[currentMessage];
+            container.insertBefore(messageDiv, container.lastElementChild);
+
+            // Show message
+            setTimeout(() => {
+                messageDiv.classList.add('show');
+            }, 100);
+
+            // Hide previous message and show next
+            setTimeout(() => {
+                const prevMessage = container.querySelector('.message:not(:last-child)');
+                if (prevMessage) {
+                    prevMessage.classList.add('fade-out');
+                    setTimeout(() => {
+                        prevMessage.remove();
+                    }, 800);
+                }
+
+                currentMessage++;
+                isAnimating = false;
+
+                // Show final message
+                if (currentMessage >= messages.length) {
+                    setTimeout(() => {
+                        showFinalMessage();
+                    }, 1000);
+                }
+            }, 3000);
+        }
+
+        function showFinalMessage() {
+            const container = document.getElementById('container');
+            container.innerHTML = `
+                <div class="final-message">
+                    <div class="message show">
+                        <div class="apology">Özür dilerim... 😔</div>
+                        <div class="heart">💕</div>
+                        <div class="love">Seni çok seviyorum! 💖</div>
+                    </div>
+                </div>
+                <div class="click-hint">Tekrar başlamak için tıklayın... ❤️</div>
+            `;
+            
+            // Add click listener to restart
+            document.addEventListener('click', restartAnimation, { once: true });
+        }
+
+        function restartAnimation() {
+            currentMessage = 0;
+            const container = document.getElementById('container');
+            container.innerHTML = '<div class="click-hint">Sayfaya tıklayın... ❤️</div>';
+            document.addEventListener('click', handleClick);
+        }
+
+        function handleClick(event) {
+            if (currentMessage < messages.length) {
+                createSparkle(event.clientX, event.clientY);
+                showMessage();
+            }
+        }
+
+        // Initialize
+        document.addEventListener('click', handleClick);
+        createBackgroundHearts();
+    </script>
+</body>
+</html>
